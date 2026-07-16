@@ -1,3 +1,5 @@
+clear
+
 #!/bin/bash
 # Define color variables
 
@@ -32,7 +34,6 @@ RANDOM_BG_COLOR=${BG_COLORS[$RANDOM % ${#BG_COLORS[@]}]}
 
 #----------------------------------------------------start--------------------------------------------------#
 
-# Header with 
 echo "${RANDOM_BG_COLOR}${RANDOM_TEXT_COLOR}${BOLD}Starting Execution${RESET}"
 
 # Step 1: Enable Cloud Run API
@@ -47,33 +48,39 @@ git clone https://github.com/GoogleCloudPlatform/generative-ai.git
 echo "${YELLOW}${BOLD}Navigating to the 'gemini-streamlit-cloudrun' directory...${RESET}"
 cd generative-ai/gemini/sample-apps/gemini-streamlit-cloudrun
 
-# Step 4: Remove existing files
+# Step 4: Copy chef.py from the cloud storage bucket
+echo "${MAGENTA}${BOLD}Copying 'chef.py' from Google Cloud Storage...${RESET}"
+gsutil cp gs://spls/gsp517/chef.py .
+
+# Step 5: Remove unnecessary files
 echo "${BLUE}${BOLD}Removing existing files: Dockerfile, chef.py, requirements.txt...${RESET}"
 rm -rf Dockerfile chef.py requirements.txt
 
-# Step 5: Download required files from updated URLs
+# Step 6: Download required files (Add specific URLs in wget commands)
 echo "${RED}${BOLD}Downloading required files...${RESET}"
-wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/chef.py
-wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/Dockerfile
-wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/requirements.txt
+wget https://raw.githubusercontent.com/ShatakshiYD/GCP-Cohort/refs/heads/main/chef.py
 
-# Step 6: Upload chef.py to the Cloud Storage bucket
+wget https://raw.githubusercontent.com/ShatakshiYD/GCP-Cohort/refs/heads/main/Dockerfile
+
+wget https://raw.githubusercontent.com/ShatakshiYD/GCP-Cohort/refs/heads/main/requirements.txt
+
+# Step 7: Upload chef.py to the Cloud Storage bucket
 echo "${CYAN}${BOLD}Uploading 'chef.py' to Cloud Storage bucket...${RESET}"
 gcloud storage cp chef.py gs://$DEVSHELL_PROJECT_ID-generative-ai/
 
-# Step 7: Set project and region variables
+# Step 8: Set project and region variables
 echo "${GREEN}${BOLD}Setting GCP project and region variables...${RESET}"
 GCP_PROJECT=$(gcloud config get-value project)
 GCP_REGION=$(gcloud compute project-info describe \
 --format="value(commonInstanceMetadata.items[google-compute-default-region])")
 
-# Step 8: Create a virtual environment and install dependencies
+# Step 9: Create a virtual environment and install dependencies
 echo "${YELLOW}${BOLD}Setting up Python virtual environment...${RESET}"
 python3 -m venv gemini-streamlit
 source gemini-streamlit/bin/activate
-python3 -m pip install -r requirements.txt
+python3 -m  pip install -r requirements.txt
 
-# Step 9: Start Streamlit application
+# Step 10: Start Streamlit application
 echo "${MAGENTA}${BOLD}Running Streamlit application in the background...${RESET}"
 nohup streamlit run chef.py \
   --browser.serverAddress=localhost \
@@ -81,17 +88,17 @@ nohup streamlit run chef.py \
   --server.enableXsrfProtection=false \
   --server.port 8080 > streamlit.log 2>&1 &
 
-# Step 10: Create Artifact Repository
+# Step 11: Create Artifact Repository
 echo "${BLUE}${BOLD}Creating Artifact Registry repository...${RESET}"
 AR_REPO='chef-repo'
 SERVICE_NAME='chef-streamlit-app' 
 gcloud artifacts repositories create "$AR_REPO" --location="$GCP_REGION" --repository-format=Docker
 
-# Step 11: Submit Cloud Build
+# Step 12: Submit Cloud Build
 echo "${RED}${BOLD}Submitting Cloud Build...${RESET}"
 gcloud builds submit --tag "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPO/$SERVICE_NAME"
 
-# Step 12: Deploy Cloud Run Service
+# Step 13: Deploy Cloud Run Service
 echo "${CYAN}${BOLD}Deploying Cloud Run service...${RESET}"
 gcloud run deploy "$SERVICE_NAME" \
   --port=8080 \
@@ -102,7 +109,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --project=$GCP_PROJECT \
   --set-env-vars=GCP_PROJECT=$GCP_PROJECT,GCP_REGION=$GCP_REGION
 
-# Step 13: Get Cloud Run Service URL
+# Step 14: Get Cloud Run Service URL
 echo "${GREEN}${BOLD}Fetching Cloud Run service URL...${RESET}"
 CLOUD_RUN_URL=$(gcloud run services describe "$SERVICE_NAME" --region="$GCP_REGION" --format='value(status.url)')
 
@@ -112,7 +119,82 @@ echo
 echo "${MAGENTA}${BOLD}Cloud Run Service is available at: ${RESET}""$CLOUD_RUN_URL"
 echo
 
-# Cleanup function
+# Function to display a random congratulatory message
+function random_congrats() {
+    MESSAGES=(
+        "${GREEN}Congratulations For Completing The Lab! Keep up the great work!${RESET}"
+        "${CYAN}Well done! Your hard work and effort have paid off!${RESET}"
+        "${YELLOW}Amazing job! You’ve successfully completed the lab!${RESET}"
+        "${BLUE}Outstanding! Your dedication has brought you success!${RESET}"
+        "${MAGENTA}Great work! You’re one step closer to mastering this!${RESET}"
+        "${RED}Fantastic effort! You’ve earned this achievement!${RESET}"
+        "${CYAN}Congratulations! Your persistence has paid off brilliantly!${RESET}"
+        "${GREEN}Bravo! You’ve completed the lab with flying colors!${RESET}"
+        "${YELLOW}Excellent job! Your commitment is inspiring!${RESET}"
+        "${BLUE}You did it! Keep striving for more successes like this!${RESET}"
+        "${MAGENTA}Kudos! Your hard work has turned into a great accomplishment!${RESET}"
+        "${RED}You’ve smashed it! Completing this lab shows your dedication!${RESET}"
+        "${CYAN}Impressive work! You’re making great strides!${RESET}"
+        "${GREEN}Well done! This is a big step towards mastering the topic!${RESET}"
+        "${YELLOW}You nailed it! Every step you took led you to success!${RESET}"
+        "${BLUE}Exceptional work! Keep this momentum going!${RESET}"
+        "${MAGENTA}Fantastic! You’ve achieved something great today!${RESET}"
+        "${RED}Incredible job! Your determination is truly inspiring!${RESET}"
+        "${CYAN}Well deserved! Your effort has truly paid off!${RESET}"
+        "${GREEN}You’ve got this! Every step was a success!${RESET}"
+        "${YELLOW}Nice work! Your focus and effort are shining through!${RESET}"
+        "${BLUE}Superb performance! You’re truly making progress!${RESET}"
+        "${MAGENTA}Top-notch! Your skill and dedication are paying off!${RESET}"
+        "${RED}Mission accomplished! This success is a reflection of your hard work!${RESET}"
+        "${CYAN}You crushed it! Keep pushing towards your goals!${RESET}"
+        "${GREEN}You did a great job! Stay motivated and keep learning!${RESET}"
+        "${YELLOW}Well executed! You’ve made excellent progress today!${RESET}"
+        "${BLUE}Remarkable! You’re on your way to becoming an expert!${RESET}"
+        "${MAGENTA}Keep it up! Your persistence is showing impressive results!${RESET}"
+        "${RED}This is just the beginning! Your hard work will take you far!${RESET}"
+        "${CYAN}Terrific work! Your efforts are paying off in a big way!${RESET}"
+        "${GREEN}You’ve made it! This achievement is a testament to your effort!${RESET}"
+        "${YELLOW}Excellent execution! You’re well on your way to mastering the subject!${RESET}"
+        "${BLUE}Wonderful job! Your hard work has definitely paid off!${RESET}"
+        "${MAGENTA}You’re amazing! Keep up the awesome work!${RESET}"
+        "${RED}What an achievement! Your perseverance is truly admirable!${RESET}"
+        "${CYAN}Incredible effort! This is a huge milestone for you!${RESET}"
+        "${GREEN}Awesome! You’ve done something incredible today!${RESET}"
+        "${YELLOW}Great job! Keep up the excellent work and aim higher!${RESET}"
+        "${BLUE}You’ve succeeded! Your dedication is your superpower!${RESET}"
+        "${MAGENTA}Congratulations! Your hard work has brought great results!${RESET}"
+        "${RED}Fantastic work! You’ve taken a huge leap forward today!${RESET}"
+        "${CYAN}You’re on fire! Keep up the great work!${RESET}"
+        "${GREEN}Well deserved! Your efforts have led to success!${RESET}"
+        "${YELLOW}Incredible! You’ve achieved something special!${RESET}"
+        "${BLUE}Outstanding performance! You’re truly excelling!${RESET}"
+        "${MAGENTA}Terrific achievement! Keep building on this success!${RESET}"
+        "${RED}Bravo! You’ve completed the lab with excellence!${RESET}"
+        "${CYAN}Superb job! You’ve shown remarkable focus and effort!${RESET}"
+        "${GREEN}Amazing work! You’re making impressive progress!${RESET}"
+        "${YELLOW}You nailed it again! Your consistency is paying off!${RESET}"
+        "${BLUE}Incredible dedication! Keep pushing forward!${RESET}"
+        "${MAGENTA}Excellent work! Your success today is well earned!${RESET}"
+        "${RED}You’ve made it! This is a well-deserved victory!${RESET}"
+        "${CYAN}Wonderful job! Your passion and hard work are shining through!${RESET}"
+        "${GREEN}You’ve done it! Keep up the hard work and success will follow!${RESET}"
+        "${YELLOW}Great execution! You’re truly mastering this!${RESET}"
+        "${BLUE}Impressive! This is just the beginning of your journey!${RESET}"
+        "${MAGENTA}You’ve achieved something great today! Keep it up!${RESET}"
+        "${RED}You’ve made remarkable progress! This is just the start!${RESET}"
+    )
+
+    RANDOM_INDEX=$((RANDOM % ${#MESSAGES[@]}))
+    echo -e "${BOLD}${MESSAGES[$RANDOM_INDEX]}"
+}
+
+# Display a random congratulatory message
+random_congrats
+
+echo -e "\n"  # Adding one blank line
+
+cd
+
 remove_files() {
     # Loop through all files in the current directory
     for file in *; do
@@ -128,6 +210,4 @@ remove_files() {
     done
 }
 
-# Execute cleanup
 remove_files
-cd
