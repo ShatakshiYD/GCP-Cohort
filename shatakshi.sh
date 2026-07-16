@@ -33,13 +33,6 @@ RANDOM_BG_COLOR=${BG_COLORS[$RANDOM % ${#BG_COLORS[@]}]}
 #----------------------------------------------------start--------------------------------------------------#
 
 # Header with 
-echo "${CYAN}${BOLD}╔════════════════════════════════════════════════════════╗${RESET}"
-echo "${CYAN}${BOLD}        Welcome to Dr abhishek Cloud tutorials       ${RESET}"
-echo "${CYAN}${BOLD}╚════════════════════════════════════════════════════════╝${RESET}"
-echo
-echo "${BLUE}${BOLD}          Tutorial by Dr. Abhishek                       ${RESET}"
-echo "${YELLOW}For more GCP tutorials, visit: https://www.youtube.com/@drabhishek.5460${RESET}"
-echo
 echo "${RANDOM_BG_COLOR}${RANDOM_TEXT_COLOR}${BOLD}Starting Execution${RESET}"
 
 # Step 1: Enable Cloud Run API
@@ -60,9 +53,9 @@ rm -rf Dockerfile chef.py requirements.txt
 
 # Step 5: Download required files from updated URLs
 echo "${RED}${BOLD}Downloading required files...${RESET}"
-wget https://raw.githubusercontent.com/Itsabhishek7py/GoogleCloudSkillsboost/main/Develop%20GenAI%20Apps%20with%20Gemini%20and%20Streamlit%20Challenge%20Lab/chef.py
-wget https://raw.githubusercontent.com/Itsabhishek7py/GoogleCloudSkillsboost/main/Develop%20GenAI%20Apps%20with%20Gemini%20and%20Streamlit%20Challenge%20Lab/Dockerfile
-wget https://raw.githubusercontent.com/Itsabhishek7py/GoogleCloudSkillsboost/main/Develop%20GenAI%20Apps%20with%20Gemini%20and%20Streamlit%20Challenge%20Lab/requirements.txt
+wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/chef.py
+wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/Dockerfile
+wget https://github.com/ShatakshiYD/GCP-Cohort/blob/main/requirements.txt
 
 # Step 6: Upload chef.py to the Cloud Storage bucket
 echo "${CYAN}${BOLD}Uploading 'chef.py' to Cloud Storage bucket...${RESET}"
@@ -117,16 +110,6 @@ echo
 echo "${YELLOW}${BOLD}Streamlit running at: ${RESET}""http://localhost:8080"
 echo
 echo "${MAGENTA}${BOLD}Cloud Run Service is available at: ${RESET}""$CLOUD_RUN_URL"
-echo
-
-# Completion message with Dr. Abhishek branding
-echo "${GREEN}${BOLD}╔════════════════════════════════════════════════════════╗${RESET}"
-echo "${GREEN}${BOLD}             Lab Completed Successfully!                ${RESET}"
-echo "${GREEN}${BOLD}╚════════════════════════════════════════════════════════╝${RESET}"
-echo
-echo "${RED}${BOLD}🙏 Thank you for following Dr. Abhishek's tutorial!${RESET}"
-echo "${YELLOW}${BOLD}📺 Subscribe for more GCP content:${RESET}"
-echo "${BLUE}https://www.youtube.com/@drabhishek.5460${RESET}"
 echo
 
 # Cleanup function
